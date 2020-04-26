@@ -9,7 +9,6 @@
 //Learned about changing the look of your app's UI using themes.
 
 import 'package:flutter/material.dart';
-import 'package:english_words/english_words.dart';
 
 void main() => runApp(MyApp());
 
@@ -17,116 +16,110 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Tour Name Generator',
+      title: 'Flutter Basics',
       theme: ThemeData(
         primaryColor: Colors.amber,
         backgroundColor: Colors.black54,
       ),
-      home: RandomWords(),
+      home: MyHomePage(title: 'Login Page'),
     );
   }
 }
 
-class RandomWordsState extends State<RandomWords> {
-  final List<WordPair> _suggestions = <WordPair>[];
-  final Set<WordPair> _saved = Set<WordPair>();
-  final TextStyle _biggerFont = TextStyle(fontSize: 18.0);
+class MyHomePage extends StatefulWidget {
+  MyHomePage({Key key, this.title}) : super(key: key);
+  // This widget is the home page of your application. It is stateful, meaning
+  // that it has a State object (defined below) that contains fields that affect
+  // how it looks.
+  // This class is the configuration for the state. It holds the values (in this
+  // case the title) provided by the parent (in this case the App widget) and
+  // used by the build method of the State. Fields in a Widget subclass are
+  // always marked "final".
+  final String title;
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
 
-  void _pushSaved() {
-    Navigator.of(context).push(
-      MaterialPageRoute<void>(   // Add 20 lines from here...
-        builder: (BuildContext context) {
-          final Iterable<ListTile> tiles = _saved.map(
-                (WordPair pair) {
-              return ListTile(
-                title: Text(
-                  pair.asPascalCase,
-                  style: _biggerFont,
-                ),
-              );
-            },
-          );
-          final List<Widget> divided = ListTile
-              .divideTiles(
-            context: context,
-            tiles: tiles,
-          )
-              .toList();
-
-          return Scaffold(
-            appBar: AppBar(
-              title: Text('Saved Tours'),
-            ),
-            body: ListView(children: divided),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildSuggestions() {
-    //this function calls _buildRow() once per word pair
-    //displays each new pair in a ListTile, which allows you to make the rows more attractive in the next step
-    return ListView.builder(
-        padding: const EdgeInsets.all(16.0),
-        itemBuilder: /*1*/ (context, i) {        /*1. The itemBuilder callback is called once per suggested word pairing, and places each suggestion into a ListTile row.
-                                                      For even rows, the function adds a ListTile row for the word pairing. For odd rows, the function adds a Divider widget
-                                                      to visually separate the entries. Note that the divider might be difficult to see on smaller devices.*/
-          if (i.isOdd) return Divider();         /*2. Add a one-pixel-high divider widget before each row in the ListView.*/
-
-          final index = i ~/ 2;                  /*3. The expression i ~/ 2 divides i by 2 and returns an integer result.
-                                                      For example: 1, 2, 3, 4, 5 becomes 0, 1, 1, 2, 2. This calculates the actual number of word pairings in the ListView,
-                                                      minus the divider widgets.*/
-          if (index >= _suggestions.length) {
-            _suggestions.addAll(generateWordPairs().take(10)); /*4. If you’ve reached the end of the available word pairings, then generate 10 more and add them to the suggestions list.*/
-          }
-          return _buildRow(_suggestions[index]);
-        });
-  }
-
-  Widget _buildRow(WordPair pair) {
-   final bool alreadySaved = _saved.contains(pair);
-
-    return ListTile(
-      title: Text(
-        pair.asPascalCase,
-        style: _biggerFont,
-      ),
-      trailing: Icon(
-        alreadySaved ? Icons.favorite : Icons.favorite_border,  //this adds heart icons
-        color: alreadySaved ? Colors.red : null,
-      ),
-      onTap: () {
-        setState(() {
-          if (alreadySaved) {
-            _saved.remove(pair);
-          } else {
-            _saved.add(pair);
-          }
-        });
-      },
-    );
-  }
+class _MyHomePageState extends State<MyHomePage> {
+  TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
 
   @override
   Widget build(BuildContext context) {
-    //1.0 The following was the first iteration in creating random word pairs
-    //final wordPair = WordPair.random();
-    //return Text(wordPair.asPascalCase);
-    //2.0 The following is the new iteration in using the _buildSuggestions() function, rather than directly calling the word generation library
-    return Scaffold(  //Scaffold implements the basic Material Design visual layout
-      appBar: AppBar(
-        title: Text('Tour Name Generator'),
-        actions: <Widget>[
-          IconButton(icon: Icon(Icons.list), onPressed: _pushSaved),  //this pushes a route(new page) updates that display. then it gets saved and pushes back to the Navigator
-        ]
+    final emailField = TextField(
+      obscureText: false,
+      style: style,
+      decoration: InputDecoration(
+          contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+          hintText: "Email",
+          border:
+          OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
+    );
+    final passwordField = TextField(
+      obscureText: true,    //this makes it hidden as a password text field should behave
+      style: style,
+      decoration: InputDecoration(
+          contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+          hintText: "Password",
+          border:
+          OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
+    );
+    final loginButton = Material(
+      elevation: 5.0,                                 //this adds a shadow to the button
+      borderRadius: BorderRadius.circular(30.0),
+      color: Color(0xff01A0C7),
+      child: MaterialButton(
+        minWidth: MediaQuery.of(context).size.width,
+        padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+        onPressed: () {},
+        child: Text("Login",
+            textAlign: TextAlign.center,
+            style: style.copyWith(
+                color: Colors.white, fontWeight: FontWeight.bold)),
       ),
-      body: _buildSuggestions(),
+    );
+
+    return Scaffold(  //Scaffold widget contains all widgets together by referencing them in here
+      body: Center(
+        child: Container(
+          color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.all(36.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                SizedBox(
+                  height: 155.0,
+                  child: Image.asset(
+                    "assets/logo.png",
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                SizedBox(height: 45.0),
+                emailField,
+                SizedBox(height: 25.0),
+                passwordField,
+                SizedBox(
+                  height: 35.0,
+                ),
+                loginButton,
+                SizedBox(
+                  height: 15.0,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
 
-class RandomWords extends StatefulWidget {
-  @override
-  RandomWordsState createState() => RandomWordsState();
+Widget _myWidget(BuildContext context) {
+  String myString = 'I ❤️Flutter';
+  print(myString);
+  return Text(
+    myString,
+    style: TextStyle(fontSize: 30.0),
+  );
 }
