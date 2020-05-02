@@ -1,27 +1,27 @@
+// Copyright 2018 The Flutter team. All rights reserved.
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE file.
+
+//Written Dart code.
+//Used hot reload for a faster development cycle.
+//Implemented a stateful widget, adding interactivity to your app.
+//Created a route and added logic for moving between the home route and the new route.
+//Learned about changing the look of your app's UI using themes.
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Flutter Basics',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.green,
+        primaryColor: Colors.amber,
+        backgroundColor: Colors.black54,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Login Page'),
     );
   }
 }
@@ -45,27 +45,8 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-  bool genresVisible = false;
 
-  GoogleMapController mapController;
-
-  final LatLng _center = const LatLng(45.521563, -122.677433);
-
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
-  }
-
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
-    });
-  }
+  TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
 
   void _toggleGenres() {
     setState(() {
@@ -80,30 +61,81 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+    final emailField = TextField(
+      obscureText: false,
+      style: style,
+      decoration: InputDecoration(
+          contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+          hintText: "Email",
+          border:
+          OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
+    );
+    final passwordField = TextField(
+      obscureText: true,    //this makes it hidden as a password text field should behave
+      style: style,
+      decoration: InputDecoration(
+          contentPadding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+          hintText: "Password",
+          border:
+          OutlineInputBorder(borderRadius: BorderRadius.circular(32.0))),
+    );
+    final loginButton = Material(
+      elevation: 5.0,                                 //this adds a shadow to the button
+      borderRadius: BorderRadius.circular(30.0),
+      color: Color(0xff01A0C7),
+      child: MaterialButton(
+        minWidth: MediaQuery.of(context).size.width,
+        padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
+        onPressed: () {},
+        child: Text("Login",
+            textAlign: TextAlign.center,
+            style: style.copyWith(
+                color: Colors.white, fontWeight: FontWeight.bold)),
       ),
-      body: GoogleMap(
-        onMapCreated: _onMapCreated,
-        initialCameraPosition: CameraPosition(
-          target: _center,
-          zoom: 11.0,
+    );
+
+    return Scaffold(  //Scaffold widget contains all widgets together by referencing them in here
+      body: Center(
+        child: Container(
+          color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.all(36.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                SizedBox(
+                  height: 155.0,
+                  child: Image.asset(
+                    "assets/logo.png",
+                    fit: BoxFit.contain,
+                  ),
+                ),
+                SizedBox(height: 45.0),
+                emailField,
+                SizedBox(height: 25.0),
+                passwordField,
+                SizedBox(
+                  height: 35.0,
+                ),
+                loginButton,
+                SizedBox(
+                  height: 15.0,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _toggleGenres,
-        tooltip: 'Toggle Genres',
-        child: Icon(Icons.settings),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+}
+
+Widget _myWidget(BuildContext context) {
+  String myString = 'I ❤ Flutter';
+  print(myString);
+  return Text(
+    myString,
+    style: TextStyle(fontSize: 30.0),
+  );
 }
