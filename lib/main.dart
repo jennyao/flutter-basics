@@ -8,6 +8,7 @@
 //Created a route and added logic for moving between the home route and the new route.
 //Learned about changing the look of your app's UI using themes.
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 void main() => runApp(MyApp());
 
@@ -44,7 +45,19 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+
   TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
+
+  void _toggleGenres() {
+    setState(() {
+      // This call to setState tells the Flutter framework that something has
+      // changed in this State, which causes it to rerun the build method below
+      // so that the display can reflect the updated values. If we changed
+      // _counter without calling setState(), then the build method would not be
+      // called again, and so nothing would appear to happen.
+      genresVisible = !genresVisible;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
