@@ -9,10 +9,12 @@
 //Learned about changing the look of your app's UI using themes.
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -117,9 +119,40 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
 
+  Future<LocationData> _locationData;
+
+  @override
+  void initState() {
+    super.initState();
+    _locationData = initializeLocation();
+  }
+
   GoogleMapController mapController;
 
-  final LatLng _center = const LatLng(45.521563, -122.677433);
+  Future<LocationData> initializeLocation() async {
+    Location location = new Location();
+
+    bool _serviceEnabled;
+    PermissionStatus _permissionGranted;
+
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        return null;
+      }
+    }
+
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return null;
+      }
+    }
+
+    return await location.getLocation();
+  }
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
@@ -131,12 +164,21 @@ class _MapScreenState extends State<MapScreen> {
       appBar: AppBar(
         title: Text("Map Screen"),
       ),
-      body: GoogleMap(
-        onMapCreated: _onMapCreated,
-        initialCameraPosition: CameraPosition(
-          target: _center,
-          zoom: 11.0,
-        ),
+      body: FutureBuilder<LocationData>(
+        future: _locationData,
+        builder: (BuildContext context, AsyncSnapshot<LocationData> snapshot) {
+          if (snapshot.hasData) {
+            return GoogleMap(
+              onMapCreated: _onMapCreated,
+              initialCameraPosition: CameraPosition(
+                target: LatLng(snapshot.data.latitude, snapshot.data.longitude),
+                zoom: 11.0,
+              ),
+            );
+          } else {
+            return Text('Loading...');
+          }
+        },
       ),
     );
   }
