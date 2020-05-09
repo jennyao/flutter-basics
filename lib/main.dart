@@ -9,10 +9,12 @@
 //Learned about changing the look of your app's UI using themes.
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart';
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -21,43 +23,20 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.amber,
         backgroundColor: Colors.black54,
       ),
-      home: MyHomePage(title: 'Login Page'),
+      initialRoute: '/',
+      routes: {
+        // When navigating to the "/" route, build the FirstScreen widget.
+        '/': (context) => LoginScreen(),
+        // When navigating to the "/second" route, build the SecondScreen widget.
+        '/second': (context) => MapScreen(),
+      },
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+class LoginScreen extends StatelessWidget {
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-
-  TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
-
-  void _toggleGenres() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      genresVisible = !genresVisible;
-    });
-  }
+  final TextStyle style = TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +65,9 @@ class _MyHomePageState extends State<MyHomePage> {
       child: MaterialButton(
         minWidth: MediaQuery.of(context).size.width,
         padding: EdgeInsets.fromLTRB(20.0, 15.0, 20.0, 15.0),
-        onPressed: () {},
+        onPressed: () {
+          Navigator.pushNamed(context, '/second');
+        },
         child: Text("Login",
             textAlign: TextAlign.center,
             style: style.copyWith(
@@ -131,11 +112,74 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
-Widget _myWidget(BuildContext context) {
-  String myString = 'I ❤ Flutter';
-  print(myString);
-  return Text(
-    myString,
-    style: TextStyle(fontSize: 30.0),
-  );
+class MapScreen extends StatefulWidget {
+  @override
+  _MapScreenState createState() => _MapScreenState();
+}
+
+class _MapScreenState extends State<MapScreen> {
+
+  Future<LocationData> _locationData;
+
+  @override
+  void initState() {
+    super.initState();
+    _locationData = initializeLocation();
+  }
+
+  GoogleMapController mapController;
+
+  Future<LocationData> initializeLocation() async {
+    Location location = new Location();
+
+    bool _serviceEnabled;
+    PermissionStatus _permissionGranted;
+
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        return null;
+      }
+    }
+
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return null;
+      }
+    }
+
+    return await location.getLocation();
+  }
+
+  void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Map Screen"),
+      ),
+      body: FutureBuilder<LocationData>(
+        future: _locationData,
+        builder: (BuildContext context, AsyncSnapshot<LocationData> snapshot) {
+          if (snapshot.hasData) {
+            return GoogleMap(
+              onMapCreated: _onMapCreated,
+              initialCameraPosition: CameraPosition(
+                target: LatLng(snapshot.data.latitude, snapshot.data.longitude),
+                zoom: 11.0,
+              ),
+            );
+          } else {
+            return Text('Loading...');
+          }
+        },
+      ),
+    );
+  }
 }
