@@ -119,6 +119,7 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
 
+  //Location location;
   Future<LocationData> _locationData;
 
   @override
@@ -139,7 +140,7 @@ class _MapScreenState extends State<MapScreen> {
     if (!_serviceEnabled) {
       _serviceEnabled = await location.requestService();
       if (!_serviceEnabled) {
-        return null;
+        return null; //TODO: Handle user refusal
       }
     }
 
@@ -147,7 +148,7 @@ class _MapScreenState extends State<MapScreen> {
     if (_permissionGranted == PermissionStatus.denied) {
       _permissionGranted = await location.requestPermission();
       if (_permissionGranted != PermissionStatus.granted) {
-        return null;
+        return null; //TODO: Handle user refusal
       }
     }
 
@@ -170,11 +171,14 @@ class _MapScreenState extends State<MapScreen> {
           if (snapshot.hasData) {
             return GoogleMap(
               onMapCreated: _onMapCreated,
+              myLocationEnabled: true,
               initialCameraPosition: CameraPosition(
                 target: LatLng(snapshot.data.latitude, snapshot.data.longitude),
                 zoom: 11.0,
               ),
             );
+          } else if (snapshot.hasError) {
+            return Text('Error resolving user location data: ${snapshot.error}');
           } else {
             return Text('Loading...');
           }
