@@ -10,6 +10,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+import 'package:flutter_auth_buttons/flutter_auth_buttons.dart';
 
 void main() => runApp(MyApp());
 
@@ -74,6 +75,12 @@ class LoginScreen extends StatelessWidget {
                 color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
+    //final GoogleSignInButton = Material(
+    //  onPressed: () {/* ... */ },
+    //  splashColor: Colors.white,
+    //  //setting splashColor to Colors.transparent will remove button ripple effect
+    //  //reference: https://pub.dev/packages/flutter_auth_buttons
+    //);
 
     return Scaffold(  //Scaffold widget contains all widgets together by referencing them in here
       body: Center(
